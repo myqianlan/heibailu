@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>黑白路</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        body,
+        html{
+            height: 100%
+        }
+        body{
+            display: flex;
+        }
+        .hei,
+        .bai{
+            flex: 1;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            font-size: 60px;
+        }
+        .hei{
+            background: #000;
+            color: #fff;
+            animation: heitobai 25s infinite alternate;
+        }
+        .bai{
+            background: #fff;
+            color: #000;
+            animation: baitohei 25s infinite alternate;
+        }
+
+        @keyframes heitobai{
+            from {
+                background: #000;
+                color: #fff;
+            }
+            to {
+                background: #fff;
+                color: #000;
+            }
+        }
+        @keyframes baitohei{
+            from {
+                background: #fff;
+                color: #000;
+            }
+            to {
+                background: #000;
+                color: #fff;
+            }
+        }
+    </style>
+</head>
+<body>
+<p class="bai">黑</p>
+<p class="hei">白</p>
+</body>
+</html>
+

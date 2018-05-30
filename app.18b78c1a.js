@@ -14834,49 +14834,54 @@ var Bip38 = __webpack_require__(186);
 var wif = __webpack_require__(197);
 
 function signmessage(privatekey, rawmsg) {
-  var ck = CoinKey.fromWif(privatekey);
-  var msg = new Buffer(rawmsg, 'utf8');
-  var shaMsg = crypto.createHash('sha256').update(msg).digest();
-  var signature = ec.sign(shaMsg, ck.privateKey);
-  return signature;
+    var ck = CoinKey.fromWif(privatekey);
+    var msg = new Buffer(rawmsg, 'utf8');
+    var shaMsg = crypto.createHash('sha256').update(msg).digest();
+    var signature = ec.sign(shaMsg, ck.privateKey);
+    var dsignature = signature.toDER('hex');
+    var pubkey = conv(ck.publicKey, { in: 'buffer', out: 'hex' });
+    return '{' + '"msg":"' + rawmsg + '","sign":"' + dsignature + '-' + pubkey + '","pubaddr":"' + ck.publicAddress + '"}';
 }
 
-function verifymessage(publickey, rawmsg, signature) {
-  var bufpublickey = conv(publickeyhex, { in: 'hex', out: 'buffer' });
-  var msg = new Buffer(rawmsg, 'utf8');
-  var shaMsg = crypto.createHash('sha256').update(msg).digest();
-  var isValid = ec.verify(shaMsg, signature, bufpublickey);
-  return isValid;
+function verifymessage(signmsg) {
+    var obj = JSON.parse(signmsg);
+    var signs = obj.sign.split('-');
+    var bufpublickey = conv(signs[1], { in: 'hex', out: 'buffer' });
+    var msg = new Buffer(obj.msg, 'utf8');
+    var shaMsg = crypto.createHash('sha256').update(msg).digest();
+    var isValid = ec.verify(shaMsg, signs[0], bufpublickey);
+    return isValid;
 }
 
 function encodeprivatekey(privatekey, password) {
-  var decoded = wif.decode(privatekey);
-  console.log(privatekey);
-  var ret = Bip38.encrypt(decoded.privateKey, decoded.compressed, password, function (status) {}, { N: 2048, r: 8, p: 8 });
-  return ret;
+    var decoded = wif.decode(privatekey);
+    console.log(privatekey);
+    var ret = Bip38.encrypt(decoded.privateKey, decoded.compressed, password, function (status) {}, { N: 2048, r: 8, p: 8 });
+    return ret;
 }
 
 function decodeprivatekey(encodestr, password) {
-  var decryptedKey = Bip38.decrypt(encodestr, password, function (status) {}, { N: 2048, r: 8, p: 8 });
-  ret = wif.encode(0x80, decryptedKey.privateKey, decryptedKey.compressed);
-  return ret;
+    var decryptedKey = Bip38.decrypt(encodestr, password, function (status) {}, { N: 2048, r: 8, p: 8 });
+    ret = wif.encode(0x80, decryptedKey.privateKey, decryptedKey.compressed);
+    return ret;
 }
 
 var privatekey = '5KN7MzqK5wt2TP1fQCYyHBtDrXdJuXbUzm4A9rKAteGu3Qi5CVR';
-var publickeyhex = '03ea9cbadad985e7f9a689713094ff04a302d75514f82ab31691330f0ab37dc79a';
-//var sign=signmessage(privatekey,'hello')
-//var isOk=verifymessage(publickeyhex,'hello',sign)
+var publickeyhex = '04d2ce831dd06e5c1f5b1121ef34c2af4bcb01b126e309234adbc3561b60c9360ea7f23327b49ba7f10d17fad15f068b8807dbbc9e4ace5d4a0b40264eefaf31a4';
+var sign = signmessage(privatekey, '你好sdfdsfdsdfsddd世界丝丝丝丝丝丝丝丝丝丝丝搜索三三四四');
+console.log(sign);
+var isOk = verifymessage(sign);
 
-//console.log(isOk)
+console.log(isOk);
 var ret = encodeprivatekey(privatekey, 'hello1234');
 console.log(ret);
 console.log(decodeprivatekey(ret, 'hello1234'));
 
 module.exports = {
-  signmessage: signmessage,
-  verifymessage: verifymessage,
-  encodeprivatekey: encodeprivatekey,
-  decodeprivatekey: decodeprivatekey
+    signmessage: signmessage,
+    verifymessage: verifymessage,
+    encodeprivatekey: encodeprivatekey,
+    decodeprivatekey: decodeprivatekey
 };
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2).Buffer))
 
